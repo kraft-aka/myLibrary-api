@@ -1,7 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const bookRouter = require('./routes/book_router');
-const homeRouter = require('./routes/home')
+const bookRouter = require("./routes/book_router");
+const homeRouter = require("./routes/home");
+const userRouter = require("./routes/user");
 
 require("dotenv").config();
 const app = express();
@@ -9,7 +10,7 @@ const app = express();
 // connects to mongodb database, URL is located in .env
 try {
   mongoose.connect(process.env.URL, {});
-  console.log('Connected to the server');
+  console.log("Connected to the server");
 } catch (err) {
   console.log(err, "Something went wrong");
 }
@@ -17,11 +18,12 @@ try {
 // enables app to automatically parse incoming JSON data
 app.use(express.json());
 
-// routes 
+// routes
 app.use(homeRouter);
 app.use(bookRouter);
+app.use(userRouter);
 
-// app runs on the port 
+// app runs on the port
 app.listen(process.env.PORT, () => {
-  console.log(`Listening on PORT ${process.env.PORT}`)
-})
+  console.log(`Listening on PORT ${process.env.PORT}`);
+});
