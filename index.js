@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const bookRouter = require('./routes/book_router')
+const bookRouter = require('./routes/book_router');
+const homeRouter = require('./routes/home')
 
 require("dotenv").config();
 const app = express();
@@ -17,6 +18,7 @@ try {
 app.use(express.json());
 
 // routes 
+app.use(homeRouter);
 app.use(bookRouter);
 
 // app runs on the port 
