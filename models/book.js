@@ -34,6 +34,19 @@ const bookSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  addedBy : {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  likes: [
+    {
+      user: {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: 'User',
+      }
+    }
+  ],
 }, { timestamps: true });
 
 

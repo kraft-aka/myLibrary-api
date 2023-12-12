@@ -9,7 +9,10 @@ async function addBook(req, res) {
     language: req.body.language,
     pages: req.body.pages,
     genre: req.body.genre,
+    addedBy: req.body.addedBy,
   });
+  const user = req.user;
+  console.log(user)
   try {
     // save the item to the collection in mongodb
     const newBook = await book.save();
@@ -55,7 +58,7 @@ async function getOneBook(req, res) {
 async function editBook(req, res) {
   try {
     const book = await Book.findOneAndUpdate(
-      { _id: req.params.id },
+      { _id: req.params.id, addedBy: req.user.id },
       {
         title: req.body.title,
         author: req.body.author,
@@ -75,7 +78,7 @@ async function editBook(req, res) {
 // deletes one books by id
 async function deleteBook(req, res) {
   try {
-    const book = await Book.findOneAndDelete({ _id: req.params.id });
+    const book = await Book.findOneAndDelete({ _id: req.params.id, user: req.user });
     if (!book) {
       res.status(500).send({ msg: "Could not find this book" });
     } else {
@@ -89,5 +92,8 @@ async function deleteBook(req, res) {
     res.status(500).send({ msg: "Something went wrong!", err: err.message });
   }
 }
+
+// add likes to a book
+
 
 module.exports = { addBook, getAllBooks, getOneBook, editBook, deleteBook };

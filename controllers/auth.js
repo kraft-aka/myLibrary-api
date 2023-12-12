@@ -7,8 +7,10 @@ async function signUp(req, res) {
     userName: req.body.userName,
     email: req.body.email,
     password: bcrypt.hashSync(req.body.password, 8),
+
   });
   try {
+    user.role = 'user';
     const newUser = await user.save();
     res.status(200).send({ msg: "User created", newUser });
   } catch (err) {
@@ -28,7 +30,6 @@ async function signIn(req, res) {
       req.body.password,
       user.password
     );
-    console.log(passwordIsValid, "++++++++++");
     if (!passwordIsValid) {
       return res.status(401).send({ msg: "Invalid password" });
     }
