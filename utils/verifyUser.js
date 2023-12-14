@@ -15,12 +15,11 @@ function verifyUser(req, res, next) {
           req.user = undefined;
           return res.status(500).send({ error, msg: "Error occuerd" });
         }
-        const user = User.findById(decode.id).exec();
+        const user = await User.findById(decode.id).exec();
         if (!user) {
           return res.status(404).send({ msg: "User was not found" });
         } else {
           req.user = user;
-          return res.status(200).send({ user });
           next();
         }
       }
