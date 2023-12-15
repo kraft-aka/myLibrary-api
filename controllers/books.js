@@ -77,15 +77,16 @@ async function editBook(req, res) {
 // deletes one books by id
 async function deleteBook(req, res) {
   try {
-    const book = await Book.findOneAndDelete({ _id: req.params.id, user: req.user });
+    const book = await Book.findOneAndDelete({
+      _id: req.params.id,
+      addedBy: req.user.id,
+    });
     if (!book) {
       res.status(500).send({ msg: "Could not find this book" });
     } else {
-      res
-        .status(200)
-        .send({
-          msg: "Book with is id: " + req.params.id + " successfully removed",
-        });
+      res.status(200).send({
+        msg: "Book with is id: " + req.params.id + " successfully removed",
+      });
     }
   } catch (err) {
     res.status(500).send({ msg: "Something went wrong!", err: err.message });
@@ -96,20 +97,58 @@ async function deleteBook(req, res) {
 async function addLikeToBook(req, res) {
   try {
     const book = await Book.findOne({ _id: req.params.id });
-    console.log(book)
+    console.log(book);
     if (!book) {
-      return res.status(404).send({ msg: 'Not found' })
+      return res.status(404).send({ msg: "Not found" });
     } else {
-      if (book.likes.filter(like => like.user.toString() === req.user.id).length > 0) {
-        return res.status(400).send({ msg: 'Already added like' })
+      if (
+        book.likes.filter((like) => like.user.toString() === req.user.id)
+          .length > 0
+      ) {
+        return res.status(400).send({ msg: "Already added like" });
       }
       book.likes.unshift({ user: req.user.id });
       await book.save();
-      return res.status(200).send({ msg: 'Liked added' })
+      return res.status(200).send({ msg: "Liked added" });
     }
   } catch (err) {
-    res.status(500).send({ msg: 'Something went wrong', err: err.message })
+    res.status(500).send({ msg: "Something went wrong", err: err.message });
   }
 }
 
-module.exports = { addBook, getAllBooks, getOneBook, editBook, deleteBook, addLikeToBook };
+//removes like from a book
+async function removeLikeFromBook(req, res) {
+  try {
+    const book = await Book.findOne({ _id: req.params.id });
+    if (!book) {
+      return res.status(404).send({ msg: "Book not found" });
+    } else {
+      if (
+        book.likes.filter((like) => like.user.toString() === req.user.id)
+          .length > 0
+      ) {
+        const idx = book.likes.findIndex(
+          (like) => like.user.toString() === req.user.id
+        );
+        book.likes.splice(idx, 1);
+        await book.save();
+        return res.status(200).send({ msg: "Successfully removed like" });
+      }
+      return res
+        .status(400)
+        .send({ msg: "User did not add like to this book" });
+    }
+  } catch (err) {
+    res.status(500).send({ msg: "Something went wrong", err: err.message });
+  }
+}
+
+module.exports = {
+  addBook,
+  getAllBooks,
+  getOneBook,
+  editBook,
+  deleteBook,
+  addLikeToBook,
+  removeLikeFromBook,
+};
