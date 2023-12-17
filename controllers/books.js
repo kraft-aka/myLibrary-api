@@ -1,4 +1,5 @@
 const Book = require("../models/book"); // import Book model+schema
+const User = require("../models/user");
 
 // adds book
 async function addBook(req, res) {
@@ -97,7 +98,6 @@ async function deleteBook(req, res) {
 async function addLikeToBook(req, res) {
   try {
     const book = await Book.findOne({ _id: req.params.id });
-    console.log(book);
     if (!book) {
       return res.status(404).send({ msg: "Not found" });
     } else {
@@ -143,6 +143,34 @@ async function removeLikeFromBook(req, res) {
   }
 }
 
+// adds book to a readning list
+async function addBookToList(req, res) {
+  try {
+    const book = req.params.id;
+    const user = await User.findOne({ _id: req.user.id });
+    console.log(book);
+    if (!user) {
+      return res.status(404).send({ msg: "Could not find a book" });
+    } else {
+      if (
+        user.readingList.filter((read) => read.book.toString() === book)
+          .length > 0
+      ) {
+        return res
+          .status(500)
+          .send({ msg: "Book is already in a reading list" });
+      }
+      user.readingList.unshift({ book });
+      await user.save();
+      return res
+        .status(200)
+        .send({ msg: "Book added successfully to the reading list", book });
+    }
+  } catch (err) {
+    res.status(500).send({ msg: "Something went wrong", err: err.message });
+  }
+}
+
 module.exports = {
   addBook,
   getAllBooks,
@@ -151,4 +179,5 @@ module.exports = {
   deleteBook,
   addLikeToBook,
   removeLikeFromBook,
+  addBookToList,
 };

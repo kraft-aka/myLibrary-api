@@ -11,6 +11,7 @@ const {
   deleteBook,
   addLikeToBook,
   removeLikeFromBook,
+  addBookToList,
 } = require("../controllers/books");
 
 router.post("/books", verifyUser, isAdmin, addBook);
@@ -20,4 +21,5 @@ router.put("/books/:id", verifyUser, isAdmin, editBook);
 router.delete("/books/:id", verifyUser, isAdmin, deleteBook);
 router.put("/books/addLike/:id", verifyUser, addLikeToBook);
 router.put("/books/removeLike/:id", verifyUser, removeLikeFromBook);
+router.put("/books/addBookToList/:id", verifyUser, addBookToList);
 module.exports = router;
