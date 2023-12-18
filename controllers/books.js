@@ -148,9 +148,9 @@ async function addBookToList(req, res) {
   try {
     const book = req.params.id;
     const user = await User.findOne({ _id: req.user.id });
-    console.log(book);
+    console.log(user);
     if (!user) {
-      return res.status(404).send({ msg: "Could not find a book" });
+      return res.status(404).send({ msg: "Could not find a user" });
     } else {
       if (
         user.readingList.filter((read) => read.book.toString() === book)
@@ -171,6 +171,32 @@ async function addBookToList(req, res) {
   }
 }
 
+//remove book from reading list
+async function deleteBookFromList(req, res) {
+  const book = req.params.id;
+  try {
+    const user = await User.findOne({ _id: req.user.id });
+    if (!user) {
+      return res.status(404).send({ msg: "Could not find user" });
+    } else {
+      if (user.readingList.some((read) => read.book.toString() === book)) {
+        const idx = user.readingList.findIndex(
+          (bookToRead) => bookToRead.book.toString() === book
+        );
+        user.readingList.splice(idx, 1);
+        await user.save();
+        return res.status(200).send({ msg: "Successfully removed book", book });
+      } else {
+        return res
+          .status(500)
+          .send({ msg: "You did not add this book to the reading list yet" });
+      }
+    }
+  } catch (err) {
+    res.status(500).send({ msg: "Something went wrong", err: err.message });
+  }
+}
+
 module.exports = {
   addBook,
   getAllBooks,
@@ -180,4 +206,5 @@ module.exports = {
   addLikeToBook,
   removeLikeFromBook,
   addBookToList,
+  deleteBookFromList,
 };
